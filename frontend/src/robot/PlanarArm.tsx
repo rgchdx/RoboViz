@@ -1,21 +1,15 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import { DEFAULT_PLANAR_ARM_CONFIG, type PlanarArmConfig } from '../types/robot'
 
-/** Static placeholder rendering of the 2R planar arm; joint sliders arrive in a later phase. */
-export function PlanarArm({ config = DEFAULT_PLANAR_ARM_CONFIG }: { config?: PlanarArmConfig }) {
-    const { linkLengths, jointAngles } = config
-    const [l1, l2] = linkLengths
-    const [theta1, theta2] = jointAngles
+interface PlanarArmProps {
+    joint1: [number, number]
+    endEffector: [number, number]
+}
 
-    const joint1Position = useMemo<[number, number, number]>(
-        () => [l1 * Math.cos(theta1), l1 * Math.sin(theta1), 0],
-        [l1, theta1],
-    )
-    const endEffectorPosition = useMemo<[number, number, number]>(() => {
-        const combined = theta1 + theta2
-        return [joint1Position[0] + l2 * Math.cos(combined), joint1Position[1] + l2 * Math.sin(combined), 0]
-    }, [joint1Position, l2, theta1, theta2])
+/** Renders the 2R planar arm from joint/end-effector positions solved by the backend. */
+export function PlanarArm({ joint1, endEffector }: PlanarArmProps) {
+    const joint1Position: [number, number, number] = [joint1[0], joint1[1], 0]
+    const endEffectorPosition: [number, number, number] = [endEffector[0], endEffector[1], 0]
 
     return (
         <group>

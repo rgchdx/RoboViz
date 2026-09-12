@@ -1,3 +1,9 @@
-# Add pinned runtime and development dependencies during backend setup.
-# Planned runtime: fastapi, uvicorn, numpy, scipy, pydantic
-# Planned development: pytest, httpx, ruff
+fastapi==0.121.2
+uvicorn[standard]==0.38.0
+numpy==2.3.4
+pydantic==2.12.4
+
+# Development
+pytest==8.4.2
+httpx==0.28.1
+ruff==0.14.5

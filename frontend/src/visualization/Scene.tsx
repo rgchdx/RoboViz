@@ -4,6 +4,11 @@ import { Canvas } from '@react-three/fiber'
 import { Grid, GizmoHelper, GizmoViewport, OrbitControls } from '@react-three/drei'
 import { PlanarArm } from '../robot/PlanarArm'
 
+interface SceneProps {
+    joint1: [number, number]
+    endEffector: [number, number]
+}
+
 /**
  * Main 3D viewport. Navigation mirrors Unity/Blender conventions:
  * - left-click + drag: pan
@@ -11,7 +16,7 @@ import { PlanarArm } from '../robot/PlanarArm'
  * - scroll wheel: zoom
  * - gizmo (bottom-right): click a face/axis to snap the camera to that view
  */
-export function Scene() {
+export function Scene({ joint1, endEffector }: SceneProps) {
     return (
         <Canvas camera={{ position: [5, 4, 5], fov: 50 }} shadows>
             <color attach="background" args={['#14161a']} />
@@ -19,7 +24,7 @@ export function Scene() {
             <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
 
             <Suspense fallback={null}>
-                <PlanarArm />
+                <PlanarArm joint1={joint1} endEffector={endEffector} />
             </Suspense>
 
             <Grid
