@@ -1,3 +1,4 @@
+// This module defines TypeScript types and default configurations for the 2R planar robotic arm.
 /** Configuration for the planar 2-revolute-joint arm (see docs/architecture.md). */
 export interface PlanarArmConfig {
     /** Link lengths [L1, L2] in scene units. */

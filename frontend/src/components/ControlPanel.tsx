@@ -1,3 +1,4 @@
+// This module defines a React component for controlling the parameters of a 2R planar robotic arm via sliders.
 import type { PlanarArmConfig } from '../types/robot'
 
 interface ControlPanelProps {

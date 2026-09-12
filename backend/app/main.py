@@ -1,4 +1,5 @@
 """FastAPI application entrypoint."""
+# main handles the setup and configuration of the FastAPI application, including middleware and route inclusion.
 from __future__ import annotations
 
 from fastapi import FastAPI

@@ -1,3 +1,4 @@
+// This module defines a React component for displaying the e-e position and transformation matrix of a 2R planar robotic arm.
 import type { ForwardKinematicsResponse } from '../api/kinematics'
 
 interface InfoPanelProps {

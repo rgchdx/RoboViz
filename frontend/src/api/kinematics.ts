@@ -1,4 +1,5 @@
 /** Typed client for the RoboViz kinematics API (see backend/app/models/kinematics.py). */
+// This module defines TypeScript interfaces and functions for interacting with the RoboViz kinematics API.
 
 export interface Point2D {
     x: number

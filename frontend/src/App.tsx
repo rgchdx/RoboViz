@@ -1,3 +1,4 @@
+// This module defines the main React application for visualizing and controlling a 2R planar robotic arm.
 import { useState } from 'react'
 import { Scene } from './visualization/Scene'
 import { ControlPanel } from './components/ControlPanel'

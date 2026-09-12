@@ -1,3 +1,4 @@
+// This module defines React components for rendering a 2R planar robotic arm in 3D using Three.js.
 import { useMemo } from 'react'
 import * as THREE from 'three'
 

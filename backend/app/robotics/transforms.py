@@ -1,4 +1,6 @@
 """SE(2) rotation and homogeneous transform helpers for planar robots."""
+# This module provides utility functions for creating 2D rotation matrices and 3x3 homogeneous transformation
+# matrices for planar robots.
 from __future__ import annotations
 
 import numpy as np

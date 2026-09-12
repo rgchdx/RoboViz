@@ -1,3 +1,4 @@
+// This module defines a custom React hook for fetching the forward kinematics of a 2R planar robotic arm from the backend.
 import { useEffect, useState } from 'react'
 import { fetchForwardKinematics, type ForwardKinematicsResponse } from '../api/kinematics'
 import type { PlanarArmConfig } from '../types/robot'

@@ -1,3 +1,4 @@
+// This module defines the main 3D scene for visualizing the 2R planar robotic arm.
 import { Suspense } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
