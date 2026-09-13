@@ -1,11 +1,8 @@
 """Request/response schemas for the kinematics API."""
-# This module defines the request and response schemas for the kinematics API.
 from __future__ import annotations
 
 from typing import Literal
 
-# import the necessary base class and field definitions from Pydantic, which is basically used for defining
-# Pydantic models
 from pydantic import BaseModel, Field
 
 

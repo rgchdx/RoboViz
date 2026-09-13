@@ -1,10 +1,11 @@
+# FastAPI application entrypoint for the RoboViz API. This basically sets up the app, middleware, and routes.
 """FastAPI application entrypoint."""
-# main handles the setup and configuration of the FastAPI application, including middleware and route inclusion.
 from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.jacobian_routes import router as jacobian_router
 from app.api.routes import router as kinematics_router
 
 app = FastAPI(title="RoboViz API", version="0.1.0")
@@ -17,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(kinematics_router, prefix="/api")
+app.include_router(jacobian_router, prefix="/api")
 
 
 @app.get("/api/health")
