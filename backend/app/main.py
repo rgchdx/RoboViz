@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.chain_routes import router as chain_router
 from app.api.jacobian_routes import router as jacobian_router
 from app.api.routes import router as kinematics_router
 
@@ -19,6 +20,7 @@ app.add_middleware(
 
 app.include_router(kinematics_router, prefix="/api")
 app.include_router(jacobian_router, prefix="/api")
+app.include_router(chain_router, prefix="/api")
 
 
 @app.get("/api/health")
