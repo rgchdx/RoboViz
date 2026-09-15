@@ -1,13 +1,11 @@
-// This module defines the main 3D scene for visualizing the 2R planar robotic arm.
-import { Suspense } from 'react'
+// This module defines the main 3D scene, generic over whatever robot is rendered as its children.
+import { Suspense, type ReactNode } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import { Grid, GizmoHelper, GizmoViewport, OrbitControls } from '@react-three/drei'
-import { PlanarArm } from '../robot/PlanarArm'
 
 interface SceneProps {
-    joint1: [number, number]
-    endEffector: [number, number]
+    children?: ReactNode
 }
 
 /**
@@ -17,16 +15,14 @@ interface SceneProps {
  * - scroll wheel: zoom
  * - gizmo (bottom-right): click a face/axis to snap the camera to that view
  */
-export function Scene({ joint1, endEffector }: SceneProps) {
+export function Scene({ children }: SceneProps) {
     return (
         <Canvas camera={{ position: [5, 4, 5], fov: 50 }} shadows>
             <color attach="background" args={['#14161a']} />
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
 
-            <Suspense fallback={null}>
-                <PlanarArm joint1={joint1} endEffector={endEffector} />
-            </Suspense>
+            <Suspense fallback={null}>{children}</Suspense>
 
             <Grid
                 infiniteGrid
