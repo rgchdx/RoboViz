@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from app.robotics.chain import chain_jacobian, forward_kinematics_chain
+from app.robotics.chain import chain_jacobian, forward_kinematics_chain, solve_ik_chain
 from app.robotics.jacobian import manipulability, space_jacobian
 from app.robotics.kinematics import forward_kinematics
 
@@ -75,3 +75,43 @@ def test_chain_manipulability_reuses_existing_function():
     j = chain_jacobian(thetas=[0.2, 0.5, -0.3], lengths=[1.0, 1.0, 1.0])
     result = manipulability(j)
     assert result.measure >= 0
+
+
+def test_solve_ik_chain_converges_to_reachable_target():
+    lengths = [1.0, 1.0, 1.0]
+    target = forward_kinematics_chain(thetas=[0.4, 0.3, -0.2], lengths=lengths).end_effector
+
+    result = solve_ik_chain(target=target, lengths=lengths)
+
+    assert result.reachable
+    assert result.final_error < 1e-3
+
+
+def test_solve_ik_chain_round_trips_through_forward_kinematics():
+    lengths = [1.5, 1.0, 0.5]
+    target = (1.2, 0.8)
+
+    result = solve_ik_chain(target=target, lengths=lengths)
+
+    assert result.reachable
+    assert result.thetas is not None
+    fk = forward_kinematics_chain(thetas=result.thetas, lengths=lengths)
+    np.testing.assert_allclose(fk.end_effector, target, atol=1e-2)
+
+
+def test_solve_ik_chain_reports_unreachable_target():
+    result = solve_ik_chain(target=(100.0, 100.0), lengths=[1.0, 1.0])
+    assert not result.reachable
+    assert result.message is not None
+
+
+def test_solve_ik_chain_defaults_initial_thetas_to_zero():
+    """Calling without initial_thetas should behave the same as passing explicit zeros."""
+    lengths = [1.0, 1.0]
+    target = (1.5, 0.3)
+
+    default_result = solve_ik_chain(target=target, lengths=lengths)
+    explicit_result = solve_ik_chain(target=target, lengths=lengths, initial_thetas=[0.0, 0.0])
+
+    assert default_result.reachable == explicit_result.reachable
+    assert default_result.thetas == pytest.approx(explicit_result.thetas)
