@@ -10,6 +10,7 @@ import { ChainInfoPanel } from './components/ChainInfoPanel'
 import { useForwardKinematics } from './hooks/useForwardKinematics'
 import { useChainForwardKinematics } from './hooks/useChainForwardKinematics'
 import { useChainJacobian } from './hooks/useChainJacobian'
+import { useChainInverseKinematics } from './hooks/useChainInverseKinematics'
 import {
     DEFAULT_PLANAR_ARM_CONFIG,
     DEFAULT_PLANAR_CHAIN_CONFIG,
@@ -29,10 +30,24 @@ function App() {
     const [chainConfig, setChainConfig] = useState<PlanarChainConfig>(DEFAULT_PLANAR_CHAIN_CONFIG)
     const chainFk = useChainForwardKinematics(chainConfig)
     const chainJacobian = useChainJacobian(chainConfig)
+    const chainIk = useChainInverseKinematics()
+    const [targetMessage, setTargetMessage] = useState<string | null>(null)
+
+    const handleTargetClick = async ({ x, y }: { x: number; y: number }) => {
+        const result = await chainIk.solve({ x, y, lengths: chainConfig.lengths, initialThetas: chainConfig.thetas })
+        if (!result) return
+
+        if (result.reachable && result.thetas) {
+            setChainConfig({ ...chainConfig, thetas: result.thetas })
+            setTargetMessage(null)
+        } else {
+            setTargetMessage(result.message ?? 'Target unreachable.')
+        }
+    }
 
     return (
         <div className="app">
-            <Scene>
+            <Scene onTargetClick={mode === 'chain' ? handleTargetClick : undefined}>
                 {mode === '2r' && armFk.data && (
                     <PlanarArm
                         joint1={[armFk.data.joint1.x, armFk.data.joint1.y]}
@@ -51,6 +66,8 @@ function App() {
                 </button>
             </div>
 
+            {mode === 'chain' && <p className="target-hint">Click anywhere in the scene to move the arm there.</p>}
+
             {mode === '2r' ? (
                 <>
                     <ControlPanel config={armConfig} onChange={setArmConfig} />
@@ -64,6 +81,7 @@ function App() {
                         jacobianData={chainJacobian.data}
                         loading={chainFk.loading}
                         error={chainFk.error}
+                        targetMessage={targetMessage}
                     />
                 </>
             )}

@@ -57,3 +57,37 @@ export async function fetchChainJacobian(
 
     return response.json() as Promise<ChainJacobianResponse>
 }
+
+export interface ChainInverseKinematicsRequest {
+    x: number
+    y: number
+    lengths: number[]
+    initial_thetas?: number[] | null
+}
+
+export interface ChainInverseKinematicsResponse {
+    reachable: boolean
+    thetas: number[] | null
+    iterations: number
+    final_error: number
+    message: string | null
+}
+
+export async function fetchChainInverseKinematics(
+    request: ChainInverseKinematicsRequest,
+    signal?: AbortSignal,
+): Promise<ChainInverseKinematicsResponse> {
+    const response = await fetch(`${API_BASE}/chain/inverse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+        signal,
+    })
+
+    if (!response.ok) {
+        const detail = await response.text()
+        throw new Error(`Chain inverse kinematics request failed (${response.status}): ${detail}`)
+    }
+
+    return response.json() as Promise<ChainInverseKinematicsResponse>
+}

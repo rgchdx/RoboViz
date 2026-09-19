@@ -1,5 +1,10 @@
 import type { PlanarChainConfig } from '../types/robot'
 
+// Every joint after the base is relative to the previous link; capping it short of a full
+// 180-degree fold-back (matches backend MAX_RELATIVE_JOINT_ANGLE) keeps a link from ending up
+// exactly on top of its neighbor.
+const MAX_RELATIVE_JOINT_ANGLE = (150 * Math.PI) / 180
+
 interface ChainControlPanelProps {
     config: PlanarChainConfig
     onChange: (config: PlanarChainConfig) => void
@@ -44,8 +49,8 @@ export function ChainControlPanel({ config, onChange }: ChainControlPanelProps) 
                     <Slider
                         label={`Joint ${i + 1} angle`}
                         value={theta}
-                        min={-Math.PI}
-                        max={Math.PI}
+                        min={i === 0 ? -Math.PI : -MAX_RELATIVE_JOINT_ANGLE}
+                        max={i === 0 ? Math.PI : MAX_RELATIVE_JOINT_ANGLE}
                         step={0.01}
                         unit=" rad"
                         onChange={(v) => updateTheta(i, v)}

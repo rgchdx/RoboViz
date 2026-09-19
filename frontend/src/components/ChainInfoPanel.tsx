@@ -5,10 +5,12 @@ interface ChainInfoPanelProps {
     jacobianData: ChainJacobianResponse | null
     loading: boolean
     error: string | null
+    /** Status message from the last click-to-target IK solve, if any. */
+    targetMessage?: string | null
 }
 
 /** Displays end-effector position, manipulability, and singularity status for an N-link chain. */
-export function ChainInfoPanel({ forwardData, jacobianData, loading, error }: ChainInfoPanelProps) {
+export function ChainInfoPanel({ forwardData, jacobianData, loading, error, targetMessage }: ChainInfoPanelProps) {
     if (error) {
         return <div className="info-panel info-panel--error">Backend error: {error}</div>
     }
@@ -30,6 +32,12 @@ export function ChainInfoPanel({ forwardData, jacobianData, loading, error }: Ch
                         {jacobianData.manipulability.toFixed(4)}
                         {jacobianData.is_singular && ' (near singular)'}
                     </p>
+                </>
+            )}
+            {targetMessage && (
+                <>
+                    <h3>Last target</h3>
+                    <p className="info-panel--error">{targetMessage}</p>
                 </>
             )}
         </div>

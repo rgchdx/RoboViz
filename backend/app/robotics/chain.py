@@ -1,12 +1,17 @@
 """Forward kinematics and Jacobian for an N-link planar chain (generalizes app/robotics/kinematics.py)."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 import numpy as np
 import numpy.typing as npt
 
 from app.robotics.transforms import homogeneous_transform, transform_point
+
+# Every joint after the base is relative to the previous link. Capping it short of a full
+# 180-degree fold-back means a link can never end up lying exactly on top of its neighbor.
+MAX_RELATIVE_JOINT_ANGLE = math.radians(150)
 
 
 @dataclass(frozen=True)
@@ -109,6 +114,9 @@ def solve_ik_chain(
 
     # Copy the initial joint angles to avoid modifying the input list.
     thetas = np.array(initial_thetas, dtype=np.float64)
+    if len(thetas) > 1:
+        # Clamp relative joint angles up front too, in case a caller passed an out-of-range value.
+        thetas[1:] = np.clip(thetas[1:], -MAX_RELATIVE_JOINT_ANGLE, MAX_RELATIVE_JOINT_ANGLE)
     I = np.eye(2) # 2x2 identity matrix for the damping term in the damped least squares update
     # Iteratively update the joint angles using the damped least squares method.
     # The least squares update is computed using the damped pseudoinverse of the Jacobian.
@@ -132,6 +140,9 @@ def solve_ik_chain(
         delta_theta = J.T @ np.linalg.inv(J @ J.T + damping**2 * I) @ error
         # Update the joint angles.
         thetas += delta_theta
+        if len(thetas) > 1:
+            # Keep relative joints away from a full fold-back so links can't overlap their neighbor.
+            thetas[1:] = np.clip(thetas[1:], -MAX_RELATIVE_JOINT_ANGLE, MAX_RELATIVE_JOINT_ANGLE)
 
     return ChainInverseKinematicsResult(
         reachable=False,

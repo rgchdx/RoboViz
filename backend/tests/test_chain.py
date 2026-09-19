@@ -115,3 +115,17 @@ def test_solve_ik_chain_defaults_initial_thetas_to_zero():
 
     assert default_result.reachable == explicit_result.reachable
     assert default_result.thetas == pytest.approx(explicit_result.thetas)
+
+
+def test_solve_ik_chain_never_folds_a_link_back_onto_its_neighbor():
+    """A target that would require a full 180-degree fold-back should saturate at the joint
+    limit instead of letting a link end up lying on top of its neighbor.
+    """
+    from app.robotics.chain import MAX_RELATIVE_JOINT_ANGLE
+
+    # Directly behind the first link: only reachable by folding link 2 back over link 1.
+    result = solve_ik_chain(target=(0.0, 0.0), lengths=[1.0, 1.0], initial_thetas=[0.0, 0.1])
+
+    assert result.thetas is not None
+    for theta in result.thetas[1:]:
+        assert abs(theta) <= MAX_RELATIVE_JOINT_ANGLE + 1e-9
