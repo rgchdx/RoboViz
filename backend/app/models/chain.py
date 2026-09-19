@@ -66,3 +66,9 @@ class ChainInverseKinematicsResponse(BaseModel):
     iterations: int
     final_error: float
     message: str | None
+
+
+# Response schema for a self-collision check on an N-link planar chain.
+class ChainCollisionResponse(BaseModel):
+    has_self_collision: bool
+    colliding_pairs: list[tuple[int, int]]

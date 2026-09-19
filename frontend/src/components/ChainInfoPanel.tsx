@@ -1,16 +1,24 @@
-import type { ChainForwardKinematicsResponse, ChainJacobianResponse } from '../api/chain'
+import type { ChainCollisionResponse, ChainForwardKinematicsResponse, ChainJacobianResponse } from '../api/chain'
 
 interface ChainInfoPanelProps {
     forwardData: ChainForwardKinematicsResponse | null
     jacobianData: ChainJacobianResponse | null
+    collisionData: ChainCollisionResponse | null
     loading: boolean
     error: string | null
     /** Status message from the last click-to-target IK solve, if any. */
     targetMessage?: string | null
 }
 
-/** Displays end-effector position, manipulability, and singularity status for an N-link chain. */
-export function ChainInfoPanel({ forwardData, jacobianData, loading, error, targetMessage }: ChainInfoPanelProps) {
+/** Displays end-effector position, manipulability, singularity, and self-collision status for an N-link chain. */
+export function ChainInfoPanel({
+    forwardData,
+    jacobianData,
+    collisionData,
+    loading,
+    error,
+    targetMessage,
+}: ChainInfoPanelProps) {
     if (error) {
         return <div className="info-panel info-panel--error">Backend error: {error}</div>
     }
@@ -31,6 +39,14 @@ export function ChainInfoPanel({ forwardData, jacobianData, loading, error, targ
                     <p className={jacobianData.is_singular ? 'info-panel--error' : undefined}>
                         {jacobianData.manipulability.toFixed(4)}
                         {jacobianData.is_singular && ' (near singular)'}
+                    </p>
+                </>
+            )}
+            {collisionData?.has_self_collision && (
+                <>
+                    <h3>Self-collision</h3>
+                    <p className="info-panel--error">
+                        Links {collisionData.colliding_pairs.map(([i, j]) => `${i + 1}-${j + 1}`).join(', ')} overlap
                     </p>
                 </>
             )}

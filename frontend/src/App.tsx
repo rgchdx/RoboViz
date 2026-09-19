@@ -11,6 +11,7 @@ import { useForwardKinematics } from './hooks/useForwardKinematics'
 import { useChainForwardKinematics } from './hooks/useChainForwardKinematics'
 import { useChainJacobian } from './hooks/useChainJacobian'
 import { useChainInverseKinematics } from './hooks/useChainInverseKinematics'
+import { useChainCollision } from './hooks/useChainCollision'
 import {
     DEFAULT_PLANAR_ARM_CONFIG,
     DEFAULT_PLANAR_CHAIN_CONFIG,
@@ -30,6 +31,7 @@ function App() {
     const [chainConfig, setChainConfig] = useState<PlanarChainConfig>(DEFAULT_PLANAR_CHAIN_CONFIG)
     const chainFk = useChainForwardKinematics(chainConfig)
     const chainJacobian = useChainJacobian(chainConfig)
+    const chainCollision = useChainCollision(chainConfig)
     const chainIk = useChainInverseKinematics()
     const [targetMessage, setTargetMessage] = useState<string | null>(null)
 
@@ -79,6 +81,7 @@ function App() {
                     <ChainInfoPanel
                         forwardData={chainFk.data}
                         jacobianData={chainJacobian.data}
+                        collisionData={chainCollision.data}
                         loading={chainFk.loading}
                         error={chainFk.error}
                         targetMessage={targetMessage}

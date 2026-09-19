@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from app.models.chain import (
+    ChainCollisionResponse,
     ChainForwardKinematicsResponse,
     ChainInverseKinematicsRequest,
     ChainInverseKinematicsResponse,
@@ -13,6 +14,7 @@ from app.models.chain import (
     PlanarChainRequest,
 )
 from app.robotics.chain import chain_jacobian, forward_kinematics_chain, solve_ik_chain
+from app.robotics.collision import find_self_collisions
 from app.robotics.jacobian import end_effector_velocity, manipulability
 
 # Router for handling N-link planar chain API endpoints
@@ -61,4 +63,17 @@ def solve_chain_inverse_kinematics(request: ChainInverseKinematicsRequest) -> Ch
         iterations=result.iterations,
         final_error=result.final_error,
         message=result.message,
+    )
+
+
+@router.post("/collision", response_model=ChainCollisionResponse)
+def check_chain_self_collision(request: PlanarChainRequest) -> ChainCollisionResponse:
+    # Build the full list of joint positions including the base at (0.0, 0.0)
+    # The forward kinematics function returns the positions of all joints except the base.
+    # We prepend the base position (0.0, 0.0) to get the full list of joint positions.
+    joint_positions = [(0.0, 0.0)] + forward_kinematics_chain(request.thetas, request.lengths).joint_positions
+    collisions = find_self_collisions(joint_positions)
+    return ChainCollisionResponse(
+        has_self_collision=len(collisions) > 0,
+        colliding_pairs=collisions,
     )

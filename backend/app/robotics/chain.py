@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import numpy as np
 import numpy.typing as npt
 
+from app.robotics.collision import find_self_collisions
 from app.robotics.transforms import homogeneous_transform, transform_point
 
 # Every joint after the base is relative to the previous link. Capping it short of a full
@@ -84,6 +85,12 @@ class ChainInverseKinematicsResult:
     message: str | None
 
 
+def has_self_collision(thetas: list[float], lengths: list[float]) -> bool:
+    """Check whether the given chain configuration has any self-colliding (crossing) links."""
+    positions = [(0.0, 0.0), *forward_kinematics_chain(thetas, lengths).joint_positions]
+    return len(find_self_collisions(positions)) > 0
+
+
 def solve_ik_chain(
     target: tuple[float, float],
     lengths: list[float],
@@ -104,6 +111,11 @@ def solve_ik_chain(
 
     The damping term keeps the update well-behaved near singularities, where a plain
     pseudoinverse would blow up.
+
+    TODO (self-collision): once app/robotics/collision.py's find_self_collisions is implemented,
+    check has_self_collision(thetas.tolist(), lengths) on both the "converged" success result below
+    and the max_iterations fallback result; if it's True, return reachable=False with a message like
+    "Solution causes a self-collision." instead of the result computed below.
     """
     # Initialize the joint angles for the iterative IK solver. When None, use a zero configuration.
     if initial_thetas is None:

@@ -91,3 +91,27 @@ export async function fetchChainInverseKinematics(
 
     return response.json() as Promise<ChainInverseKinematicsResponse>
 }
+
+export interface ChainCollisionResponse {
+    has_self_collision: boolean
+    colliding_pairs: [number, number][]
+}
+
+export async function fetchChainCollision(
+    request: PlanarChainRequest,
+    signal?: AbortSignal,
+): Promise<ChainCollisionResponse> {
+    const response = await fetch(`${API_BASE}/chain/collision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+        signal,
+    })
+
+    if (!response.ok) {
+        const detail = await response.text()
+        throw new Error(`Chain collision check failed (${response.status}): ${detail}`)
+    }
+
+    return response.json() as Promise<ChainCollisionResponse>
+}
